@@ -81,3 +81,59 @@ class TestLanguageModels(e2e_base.TestEndToEnd):
         for embedding in embeddings:
             vector = embedding.values
             assert len(vector) == 768
+
+    def test_tuning(self):
+        """Test tuning, listing and loading models."""
+        aiplatform.init(project=e2e_base._PROJECT, location=e2e_base._LOCATION)
+
+        model = TextGenerationModel.from_pretrained("google/text-bison@001")
+
+        # training_data="gs://llm-fishfood-preview1/q_a_train_with_context.jsonl"
+
+        import pandas
+
+        training_data = pandas.DataFrame(
+            data=[
+                {"input_text": "Input 0", "output_text": "Output 0"},
+                {"input_text": "Input 1", "output_text": "Output 1"},
+                {"input_text": "Input 2", "output_text": "Output 2"},
+                {"input_text": "Input 3", "output_text": "Output 3"},
+                {"input_text": "Input 4", "output_text": "Output 4"},
+                {"input_text": "Input 5", "output_text": "Output 5"},
+                {"input_text": "Input 6", "output_text": "Output 6"},
+                {"input_text": "Input 7", "output_text": "Output 7"},
+                {"input_text": "Input 8", "output_text": "Output 8"},
+                {"input_text": "Input 9", "output_text": "Output 9"},
+            ]
+        )
+
+        model.tune_model(
+            training_data=training_data,
+            train_steps=1,
+            tuning_job_location="europe-west4",
+            tuned_model_location="us-central1",
+        )
+
+        response = model.predict(
+            "What is the best recipe for banana bread? Recipe:",
+            max_output_tokens=128,
+            temperature=0,
+            top_p=1,
+            top_k=5,
+        )
+        assert response.text
+
+        tuned_model_names = model.list_tuned_model_names()
+        assert tuned_model_names
+        tuned_model_name = tuned_model_names[0]
+
+        tuned_model = TextGenerationModel.get_tuned_model(tuned_model_name)
+
+        tuned_model_response = tuned_model.predict(
+            "What is the best recipe for banana bread? Recipe:",
+            max_output_tokens=128,
+            temperature=0,
+            top_p=1,
+            top_k=5,
+        )
+        assert tuned_model_response.text
