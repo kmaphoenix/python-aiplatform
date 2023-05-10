@@ -1,6 +1,13 @@
 # Changelog
 
 
+## [1.26.0](https://github.com/googleapis/python-aiplatform/compare/v1.25.0...v1.26.0) (2023-05-10)
+
+
+### Features
+
+* Adding `enable_access_logging` parameter to Endpoint.deploy() method, minor edit to batch_predict() docstring ([794cedd](https://github.com/googleapis/python-aiplatform/commit/794cedd0e9e34544d6c8d5bf6892ef2c28eaaf5d))
+
 ## [1.25.0](https://github.com/googleapis/python-aiplatform/compare/v1.24.1...v1.25.0) (2023-05-09)
 
 
